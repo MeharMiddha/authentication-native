@@ -1,0 +1,154 @@
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { FIREBASE_AUTH } from "@/FirebaseConfig";
+import { RootStackParamList } from "../index"; // Adjust the path as necessary
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+
+type Props = NativeStackScreenProps<RootStackParamList, "Login">;
+
+export default function Login({ navigation }: Props) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const auth = FIREBASE_AUTH;
+
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      const response = await signInWithEmailAndPassword(auth, email, password);
+      console.log(response);
+      alert("Signin Successfull");
+    } catch (error: any) {
+      console.log(error);
+      alert("Sign In Failed: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.card}>
+      <KeyboardAvoidingView behavior="padding">
+        <View style={styles.headingContainer}>
+          <Text style={styles.heading}>Login</Text>
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+            autoCapitalize="none"
+          />
+          <TextInput
+            placeholder="Password"
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            autoCapitalize="none"
+            secureTextEntry={true}
+          />
+        </View>
+        <View style={styles.btnContainer}>
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <>
+              <TouchableOpacity style={styles.login} onPress={handleLogin}>
+                <Text style={styles.buttonText}>Login</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.signup}
+                onPress={() => navigation.navigate("Signup")} // Navigate to Signup screen
+              >
+                <Text style={styles.buttonTextSignup}>Create Account</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </KeyboardAvoidingView>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 20,
+    justifyContent:"center",
+    flex:1,
+    backgroundColor:"#6082B6",
+  },
+  card:{
+    height:500,
+    backgroundColor: "#ADD8E6",
+    borderRadius:30,
+    padding:20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.40,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  headingContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding:10,
+  },
+  heading: {
+    fontSize: 50,
+    fontWeight: "bold",
+    color:"#6082B6",
+  },
+  inputContainer:{
+    padding:10,
+  },
+  input: {
+    margin: 10,
+    height: 50,
+    borderColor: "#6082B6",
+    borderWidth: 1,
+    padding: 10,
+    fontSize: 18,
+    borderRadius: 30,
+    fontWeight:"700",
+  },
+  btnContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+    padding:30,
+  },
+  login: {
+    backgroundColor: "#007BFF",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    width:100,
+  },
+  signup: {
+    padding: 10,
+    marginLeft:20,
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  buttonTextSignup: {
+    fontSize: 20,
+    color: "#007BFF",
+  },
+});
